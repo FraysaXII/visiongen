@@ -1,0 +1,16 @@
+build:
+gpu: true
+python_version: "3.11"
+system_packages:
+  - "git"
+python_packages:
+  - "torch==2.1.2"
+  - "torchvision==0.16.2"
+  - "httpx==0.25.2"
+  - "websocket-client==1.7.0"
+
+run:
+  # Clone ComfyUI into the build environment
+  - "git clone https://github.com/comfyanonymous/ComfyUI.git ."
+  # Install ComfyUI's specific dependencies
+  - "pip install -r requirements.txt"
