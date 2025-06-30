@@ -9,9 +9,9 @@ build:
     - "httpx==0.25.2"
     - "websocket-client==1.7.0"
   run:
-    # Clone ComfyUI into the build environment
-    - "git clone https://github.com/comfyanonymous/ComfyUI.git ."
+    # Clone ComfyUI into a subdirectory
+    - "git clone https://github.com/comfyanonymous/ComfyUI.git"
     # Install ComfyUI's specific dependencies
-    - "pip install -r requirements.txt"
+    - "pip install -r ComfyUI/requirements.txt"
 
 predict: "predict.py:Predictor"

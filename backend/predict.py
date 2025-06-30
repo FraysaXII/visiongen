@@ -41,13 +41,13 @@ class Predictor(BasePredictor):
         os.makedirs(COMFYUI_INPUT_DIR)
 
         # Start the ComfyUI server in the background
-        self.comfy_proc = subprocess.Popen(["python", "main.py", "--listen", "127.0.0.1", "--output-directory", COMFYUI_OUTPUT_DIR])
+        self.comfy_proc = subprocess.Popen(["python", "ComfyUI/main.py", "--listen", "127.0.0.1", "--output-directory", COMFYUI_OUTPUT_DIR])
 
         # --- Download Models ---
         # This is where you download your required models.
         download_file(
             "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors",
-            "models/checkpoints"
+            "ComfyUI/models/checkpoints"
         )
 
         # Load the workflow "recipe" from the JSON file
