@@ -8,6 +8,7 @@ build:
     - "torchvision==0.16.2"
     - "httpx==0.25.2"
     - "websocket-client==1.7.0"
+    - "pydantic==1.10.22"
   run:
     # Clone ComfyUI into a subdirectory
     - "git clone https://github.com/comfyanonymous/ComfyUI.git"
