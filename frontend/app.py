@@ -13,10 +13,10 @@ st.set_page_config(
 # --- API Configuration ---
 # This is stored in Streamlit's secrets manager, not in the code.
 REPLICATE_API_TOKEN = st.secrets.get("REPLICATE_API_TOKEN")
+MODEL_ENDPOINT = st.secrets.get("MODEL_ENDPOINT")
 
-# IMPORTANT: Replace this with your model's endpoint from the Replicate dashboard.
+# IMPORTANT: The MODEL_ENDPOINT secret must be set in your Streamlit Cloud app.
 # It should look like: "username/model-name:version_id"
-MODEL_ENDPOINT = "holistika-research/visual-poc:a1b2c3d4e5f6..." 
 
 # --- UI Elements ---
 st.title("🎨 Holistika AI Canvas")
@@ -35,8 +35,8 @@ with st.form("generation_form"):
 if submitted:
     if not REPLICATE_API_TOKEN:
         st.error("CRITICAL: Replicate API token is not configured. Please contact the System Owner.")
-    elif "..." in MODEL_ENDPOINT:
-        st.error("CRITICAL: The MODEL_ENDPOINT has not been set in the code. Please update `frontend/app.py` with the correct Replicate model version.")
+    elif not MODEL_ENDPOINT or "..." in MODEL_ENDPOINT:
+        st.error("CRITICAL: The MODEL_ENDPOINT secret has not been set in Streamlit Cloud. Please add it in your app's settings.")
     else:
         with st.spinner("Sending prompt to the AI..."):
             headers = {

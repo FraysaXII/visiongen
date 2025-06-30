@@ -54,7 +54,14 @@ You only need to perform these steps once to connect your repository to the clou
 1.  **Sign in** to [Streamlit Community Cloud](https://share.streamlit.io) with your GitHub account.
 2.  Click **New app** and choose this repository.
 3.  Set the **Main file path** to `frontend/app.py`.
-4.  Under **Advanced settings**, add your `REPLICATE_API_TOKEN` to the **Secrets**.
+4.  Under **Advanced settings**, add your secrets. You will need two:
+    *   `REPLICATE_API_TOKEN`: Your API token from Replicate (starts with `r8_...`).
+    *   `MODEL_ENDPOINT`: The full model string from Replicate, including the version hash (e.g., `your-username/your-model-name:version_id`).
+    ```toml
+    # Example .streamlit/secrets.toml content
+    REPLICATE_API_TOKEN = "r8_YourReplicateTokenHere..."
+    MODEL_ENDPOINT = "fraysaxii/infinite-paraphraser-2:d55515957cb3f9efb701b293661f41a06a9142445f786eac0119ddcbd3a20f95"
+    ```
 5.  Click **Deploy!**.
 
 ## 🚀 Ongoing Deployment
@@ -63,12 +70,7 @@ With the one-time setup complete, your workflow is now simple:
 
 1.  Make your changes to the frontend or backend code.
 2.  **Commit and push** your changes to the `main` branch.
-    ```bash
-    git commit -am "Updated model logic"
-    git push
-    ```
-3.  Both Replicate and Streamlit Cloud will automatically deploy the new versions.
-4.  **Important**: After the first successful backend deployment, you must copy the new **version ID** from Replicate and paste it into the `MODEL_ENDPOINT` variable in `frontend/app.py`. Commit and push this change one last time to connect the live frontend to the live backend.
+3.  Both Replicate and Streamlit Cloud will automatically deploy the new versions. If you update the backend, a new model version will be created. You can then update the `MODEL_ENDPOINT` secret in your Streamlit Cloud settings to point the app to the new version without a code change.
 
 ## 🛠️ Configuration
 
