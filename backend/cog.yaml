@@ -14,3 +14,5 @@ run:
   - "git clone https://github.com/comfyanonymous/ComfyUI.git ."
   # Install ComfyUI's specific dependencies
   - "pip install -r requirements.txt"
+
+predict: "predict.py:Predictor"
