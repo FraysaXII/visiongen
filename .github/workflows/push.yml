@@ -22,6 +22,7 @@ jobs:
       - name: Setup Cog
         uses: replicate/setup-cog@v2
         with:
+          cog-version: "v0.15.4"
           token: ${{ secrets.REPLICATE_CLI_AUTH_TOKEN }}
 
       - name: Push to Replicate
