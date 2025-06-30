@@ -1,81 +1,77 @@
 # 🎨 Holistika AI Canvas
 
-This repository contains the full-stack source code for the Holistika AI Canvas, an internal tool for generative visual AI. The project is designed for a fully-automated deployment workflow using Git.
+This repository contains the full-stack source code for the Holistika AI Canvas. The project is designed for a CI/CD workflow using GitHub Actions to deploy the backend, and Streamlit Cloud for the frontend.
 
 ## 🚀 The Workflow
 
-This project follows SOP-AI_VISUAL_APP_001. The core principle is simple: **a `git push` to this repository automatically deploys a live backend API on Replicate and a live frontend web application on Streamlit Community Cloud.**
+This project is configured for a full CI/CD pipeline:
 
-This eliminates the need for local Docker builds or manual deployment steps.
+1.  **Backend**: Pushing a change to the `main` branch automatically triggers a **GitHub Action**. This action builds the model from the `backend/` directory and deploys it to Replicate.
+2.  **Frontend**: Pushing a change to the `main` branch also triggers an automatic deployment on **Streamlit Cloud**, updating the UI.
+
+This means a single `git push` updates both your live backend and frontend.
 
 ```mermaid
 graph TD
     subgraph "Development (Single GitHub Repo)"
-        A["<b>Backend Logic</b><br>backend/predict.py<br>backend/replicate.yaml"]
-        B["<b>Frontend Logic</b><br>frontend/app.py<br>requirements.txt"]
-        C["<b>AI Recipe</b><br>workflow_api.json"]
+        A["<b>Backend & AI Recipe</b><br>backend/*"]
+        B["<b>Frontend Logic</b><br>frontend/*, requirements.txt"]
+        C[<b>GitHub Action</b><br>.github/workflows/push.yml]
+        
+        A & B & C -- Git Push to main --> D{GitHub}
     end
 
-    subgraph "Automated Deployment (On Git Push)"
-        A & C -- Pushes to --> E("<b>Replicate.com</b><br>Builds & Deploys Backend")
-        B -- Pushes to --> F("<b>Streamlit Cloud</b><br>Builds & Deploys Frontend")
+    subgraph "Automated Deployment"
+        D -- Triggers --> E("<b>GitHub Action</b><br>Builds & Pushes Model")
+        E -- Deploys to --> G{"<b>Replicate.com</b><br>Hosts Backend API"}
+        D -- Triggers --> F("<b>Streamlit Cloud</b><br>Builds & Deploys Frontend")
     end
     
     subgraph "Final Product"
-        E --> G{"<b>Backend API</b><br>Live Endpoint"}
-        F --> H("<b>Holistika AI Canvas</b><br>Live Web App")
+        H("<b>Holistika AI Canvas</b><br>Live Web App")
         H -- Makes API Calls to --> G
         I[Internal User] --> H
     end
 ```
 
-## 🛠️ Deployment Steps
+## 🛠️ One-Time Setup
 
-Follow these steps to deploy the application from scratch.
+You only need to perform these steps once to connect your repository to the cloud services.
 
-### 1. GitHub Repository
-Ensure all the code from this project is in a single GitHub repository.
+### 1. Backend Connection (Replicate)
 
-### 2. Deploy the Backend to Replicate
-The backend is the AI model that runs the ComfyUI workflow.
+1.  **Create a Model on Replicate**: Go to [replicate.com/create](https://replicate.com/create) and create a "blank" model page (e.g., `your-username/your-model-name`).
+2.  **Add Replicate Token to GitHub**:
+    *   Get your API token from [replicate.com/auth/token](https://replicate.com/auth/token).
+    *   In your GitHub repo, go to `Settings` > `Secrets and variables` > `Actions`. Add it as a repository secret named `REPLICATE_CLI_AUTH_TOKEN`.
+3.  **Set Replicate Model Name in GitHub**:
+    *   In the same `Actions` settings area, go to the **Variables** tab.
+    *   Create a new repository variable named `REPLICATE_MODEL_NAME`.
+    *   Set its value to the destination model name from Step 1 (e.g., `your-username/your-model-name`).
 
-1.  Sign in to [Replicate](https://replicate.com) with your GitHub account.
-2.  Go to the **Models** section and click **Create a new model**.
-3.  Choose **Connect with GitHub** and select your repository.
-4.  Replicate will automatically detect the `replicate.yaml` file in the `backend/` directory and start building your model.
-5.  Once the build is successful, you will have a live model page. Copy the **Model Version ID** (it's a long string of characters). You will need this for the frontend.
+### 2. Frontend Connection (Streamlit Cloud)
 
-### 3. Deploy the Frontend to Streamlit Cloud
-The frontend is the interactive web UI where users will interact with the model.
+1.  **Sign in** to [Streamlit Community Cloud](https://share.streamlit.io) with your GitHub account.
+2.  Click **New app** and choose this repository.
+3.  Set the **Main file path** to `frontend/app.py`.
+4.  Under **Advanced settings**, add your `REPLICATE_API_TOKEN` to the **Secrets**.
+5.  Click **Deploy!**.
 
-1.  Sign in to [Streamlit Community Cloud](https://share.streamlit.io) with your GitHub account.
-2.  Click **New app** and choose your repository.
-3.  Set the **Branch** to `main` (or your development branch).
-4.  Set the **Main file path** to `frontend/app.py`.
-5.  Click on **Advanced settings...**.
-6.  In the **Secrets** section, add your Replicate API token:
-    ```toml
-    REPLICATE_API_TOKEN = "r8_YourReplicateTokenHere..."
+## 🚀 Ongoing Deployment
+
+With the one-time setup complete, your workflow is now simple:
+
+1.  Make your changes to the frontend or backend code.
+2.  **Commit and push** your changes to the `main` branch.
+    ```bash
+    git commit -am "Updated model logic"
+    git push
     ```
-7.  Click **Deploy!**. Streamlit will now build and deploy your application.
+3.  Both Replicate and Streamlit Cloud will automatically deploy the new versions.
+4.  **Important**: After the first successful backend deployment, you must copy the new **version ID** from Replicate and paste it into the `MODEL_ENDPOINT` variable in `frontend/app.py`. Commit and push this change one last time to connect the live frontend to the live backend.
 
-### 4. Connect the Frontend to the Backend
-The final step is to tell the frontend app which Replicate model to talk to.
+## 🛠️ Configuration
 
-1.  Open the `frontend/app.py` file.
-2.  Find the `MODEL_ENDPOINT` variable.
-3.  Replace the placeholder with the **Model Version ID** you copied from Replicate in Step 2.5. The format should be `your-replicate-username/your-model-name:version_id`.
-    ```python
-    # frontend/app.py
-    MODEL_ENDPOINT = "your-username/your-model-name:a1b2c3d4e5f6..." # <-- IMPORTANT
-    ```
-4.  **Commit and push this change** to your GitHub repository.
-5.  Streamlit Cloud will automatically detect the change and redeploy your app.
-
-Your Holistika AI Canvas is now live and fully operational.
-
-## ⚙️ Configuration
-
--   **AI Logic**: The image generation process is defined in `workflow_api.json`. If you change the workflow (e.g., using a different model or adding new inputs), you must update this file. Remember to also update `backend/predict.py` if your input node IDs change.
--   **Model Dependencies**: Any new Python packages required for the backend model should be added to `backend/replicate.yaml`.
+-   **AI Logic**: The image generation process is defined in `backend/workflow_api.json`. If you change the workflow (e.g., using a different model or adding new inputs), you must update this file. Remember to also update `backend/predict.py` if your input node IDs change.
+-   **Model Dependencies**: Any new Python packages required for the backend model should be added to `backend/cog.yaml`.
 -   **UI Dependencies**: Any new Python packages required for the Streamlit app should be added to `requirements.txt`. 

@@ -50,8 +50,8 @@ class Predictor(BasePredictor):
             "models/checkpoints"
         )
 
-        # Load the workflow "recipe" from the JSON file in the root directory
-        with open('../workflow_api.json', 'r') as f:
+        # Load the workflow "recipe" from the JSON file
+        with open('workflow_api.json', 'r') as f:
             self.workflow_api = json.load(f)
 
         # Wait until the ComfyUI server is ready
